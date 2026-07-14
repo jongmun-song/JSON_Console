@@ -8,13 +8,16 @@
 ConsoleApp::ConsoleApp(MemberRepository& repo) : repo_(repo) {}
 
 void ConsoleApp::printMenu() const {
-    std::cout << "\n===== 회원 관리 =====\n";
-    std::cout << "1. Create\n";
-    std::cout << "2. 전체 목록 보기\n";
-    std::cout << "3. ID로 검색\n";
-    std::cout << "4. Update\n";
-    std::cout << "5. Delete\n";
-    std::cout << "0. 종료\n";
+    std::cout << "\n========================================\n";
+    std::cout << "                회원 관리\n";
+    std::cout << "========================================\n";
+    std::cout << "  1. Create\n";
+    std::cout << "  2. 전체 목록 보기\n";
+    std::cout << "  3. ID로 검색\n";
+    std::cout << "  4. Update\n";
+    std::cout << "  5. Delete\n";
+    std::cout << "  0. 종료\n";
+    std::cout << "========================================\n";
     std::cout << "선택: ";
 }
 
@@ -63,6 +66,7 @@ void ConsoleApp::handleReadAll() {
         return;
     }
 
+    std::cout << "총 " << members.size() << "명의 회원이 있습니다.\n";
     for (const Member& member : members) {
         printMember(member);
     }
@@ -218,10 +222,12 @@ void ConsoleApp::handleDelete() {
 }
 
 void ConsoleApp::printMember(const Member& member) const {
-    std::cout << "id: " << member.id
-               << ", 이름: " << member.name
-               << ", 전화번호: " << member.phone
-               << ", 이메일: " << member.email << "\n";
+    std::cout << "----------------------------------------\n";
+    std::cout << "  ID       : " << member.id << "\n";
+    std::cout << "  이름     : " << member.name << "\n";
+    std::cout << "  전화번호 : " << member.phone << "\n";
+    std::cout << "  이메일   : " << member.email << "\n";
+    std::cout << "----------------------------------------\n";
 }
 
 void ConsoleApp::run() {
