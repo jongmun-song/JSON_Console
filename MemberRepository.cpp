@@ -74,6 +74,26 @@ bool MemberRepository::update(int id, const std::function<void(Member&)>& mutato
     return false;
 }
 
+bool MemberRepository::remove(int id) {
+    for (auto it = memberList_.begin(); it != memberList_.end(); ++it) {
+        if (it->id == id) {
+            std::size_t index = static_cast<std::size_t>(it - memberList_.begin());
+            Member backup = *it;
+            it = memberList_.erase(it);
+
+            try {
+                save();
+            } catch (...) {
+                memberList_.insert(memberList_.begin() + static_cast<std::ptrdiff_t>(index), backup);
+                throw;
+            }
+
+            return true;
+        }
+    }
+    return false;
+}
+
 int MemberRepository::nextId() const {
     int maxId = 0;
     for (const Member& member : memberList_) {

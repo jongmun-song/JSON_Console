@@ -13,6 +13,7 @@ void ConsoleApp::printMenu() const {
     std::cout << "2. 전체 목록 보기\n";
     std::cout << "3. ID로 검색\n";
     std::cout << "4. Update\n";
+    std::cout << "5. Delete\n";
     std::cout << "0. 종료\n";
     std::cout << "선택: ";
 }
@@ -67,21 +68,28 @@ void ConsoleApp::handleReadAll() {
     }
 }
 
-void ConsoleApp::handleReadById() {
-    std::cout << "검색할 ID: ";
+std::optional<int> ConsoleApp::readId(const std::string& prompt) const {
+    std::cout << prompt;
     std::string line;
     if (!std::getline(std::cin, line)) {
         std::cout << "입력이 취소되었습니다.\n";
-        return;
+        return std::nullopt;
     }
 
-    int id = 0;
     try {
-        id = std::stoi(line);
+        return std::stoi(line);
     } catch (const std::exception&) {
         std::cout << "올바른 숫자를 입력해 주세요.\n";
+        return std::nullopt;
+    }
+}
+
+void ConsoleApp::handleReadById() {
+    std::optional<int> idOpt = readId("검색할 ID: ");
+    if (!idOpt.has_value()) {
         return;
     }
+    int id = idOpt.value();
 
     std::optional<Member> found = repo_.findById(id);
     if (!found.has_value()) {
@@ -93,20 +101,11 @@ void ConsoleApp::handleReadById() {
 }
 
 void ConsoleApp::handleUpdate() {
-    std::cout << "수정할 ID: ";
-    std::string line;
-    if (!std::getline(std::cin, line)) {
-        std::cout << "입력이 취소되었습니다.\n";
+    std::optional<int> idOpt = readId("수정할 ID: ");
+    if (!idOpt.has_value()) {
         return;
     }
-
-    int id = 0;
-    try {
-        id = std::stoi(line);
-    } catch (const std::exception&) {
-        std::cout << "올바른 숫자를 입력해 주세요.\n";
-        return;
-    }
+    int id = idOpt.value();
 
     std::optional<Member> found = repo_.findById(id);
     if (!found.has_value()) {
@@ -178,6 +177,46 @@ void ConsoleApp::handleUpdate() {
     }
 }
 
+void ConsoleApp::handleDelete() {
+    std::optional<int> idOpt = readId("삭제할 ID: ");
+    if (!idOpt.has_value()) {
+        return;
+    }
+    int id = idOpt.value();
+
+    std::optional<Member> found = repo_.findById(id);
+    if (!found.has_value()) {
+        std::cout << "해당 ID의 회원을 찾을 수 없습니다.\n";
+        return;
+    }
+
+    std::cout << "삭제 대상:\n";
+    printMember(found.value());
+
+    std::cout << "정말 삭제하시겠습니까? (Y/N): ";
+    std::string confirm;
+    if (!std::getline(std::cin, confirm)) {
+        std::cout << "입력이 취소되었습니다.\n";
+        return;
+    }
+
+    if (confirm != "Y" && confirm != "y") {
+        std::cout << "삭제가 취소되었습니다.\n";
+        return;
+    }
+
+    try {
+        bool removed = repo_.remove(id);
+        if (removed) {
+            std::cout << "회원이 삭제되었습니다.\n";
+        } else {
+            std::cout << "해당 ID의 회원을 찾을 수 없습니다.\n";
+        }
+    } catch (const std::exception& e) {
+        std::cout << "회원 삭제에 실패했습니다: " << e.what() << "\n";
+    }
+}
+
 void ConsoleApp::printMember(const Member& member) const {
     std::cout << "id: " << member.id
                << ", 이름: " << member.name
@@ -216,6 +255,11 @@ void ConsoleApp::run() {
 
         if (line == "4") {
             handleUpdate();
+            continue;
+        }
+
+        if (line == "5") {
+            handleDelete();
             continue;
         }
 
