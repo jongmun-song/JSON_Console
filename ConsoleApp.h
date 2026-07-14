@@ -15,6 +15,7 @@ private:
     void handleCreate();
     void handleReadAll();
     void handleReadById();
+    void handleUpdate();
     void printMember(const Member& member) const;
 
     MemberRepository& repo_;

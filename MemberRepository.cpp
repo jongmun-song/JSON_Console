@@ -55,6 +55,25 @@ std::optional<Member> MemberRepository::findById(int id) const {
     return std::nullopt;
 }
 
+bool MemberRepository::update(int id, const std::function<void(Member&)>& mutator) {
+    for (Member& member : memberList_) {
+        if (member.id == id) {
+            Member backup = member;
+            mutator(member);
+
+            try {
+                save();
+            } catch (...) {
+                member = backup;
+                throw;
+            }
+
+            return true;
+        }
+    }
+    return false;
+}
+
 int MemberRepository::nextId() const {
     int maxId = 0;
     for (const Member& member : memberList_) {

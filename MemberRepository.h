@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <filesystem>
+#include <functional>
 #include <optional>
 #include <vector>
 
@@ -31,6 +32,11 @@ public:
     // id와 일치하는 회원을 memberList_에서 선형 탐색해 반환한다.
     // 일치하는 항목이 없으면 std::nullopt을 반환한다(예외를 던지지 않는다).
     std::optional<Member> findById(int id) const;
+
+    // id와 일치하는 회원을 찾아 mutator로 필드를 변경한 뒤 save()를 호출한다.
+    // 대상이 없으면 아무 것도 하지 않고 false를 반환한다(예외를 던지지 않는다).
+    // save()가 실패하면 변경 전 상태로 롤백하고 예외를 상위로 전달한다.
+    bool update(int id, const std::function<void(Member&)>& mutator);
 
 private:
     int nextId() const;   // memberList_ 내 최댓값 id + 1 (없으면 1)

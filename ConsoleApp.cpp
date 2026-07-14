@@ -12,6 +12,7 @@ void ConsoleApp::printMenu() const {
     std::cout << "1. Create\n";
     std::cout << "2. 전체 목록 보기\n";
     std::cout << "3. ID로 검색\n";
+    std::cout << "4. Update\n";
     std::cout << "0. 종료\n";
     std::cout << "선택: ";
 }
@@ -91,6 +92,92 @@ void ConsoleApp::handleReadById() {
     printMember(found.value());
 }
 
+void ConsoleApp::handleUpdate() {
+    std::cout << "수정할 ID: ";
+    std::string line;
+    if (!std::getline(std::cin, line)) {
+        std::cout << "입력이 취소되었습니다.\n";
+        return;
+    }
+
+    int id = 0;
+    try {
+        id = std::stoi(line);
+    } catch (const std::exception&) {
+        std::cout << "올바른 숫자를 입력해 주세요.\n";
+        return;
+    }
+
+    std::optional<Member> found = repo_.findById(id);
+    if (!found.has_value()) {
+        std::cout << "해당 ID의 회원을 찾을 수 없습니다.\n";
+        return;
+    }
+
+    std::cout << "수정 대상:\n";
+    printMember(found.value());
+
+    std::cout << "수정할 필드를 선택하세요 (1: 이름, 2: 전화번호, 3: 이메일): ";
+    std::string fieldLine;
+    if (!std::getline(std::cin, fieldLine)) {
+        std::cout << "입력이 취소되었습니다.\n";
+        return;
+    }
+
+    if (fieldLine != "1" && fieldLine != "2" && fieldLine != "3") {
+        std::cout << "잘못된 선택입니다.\n";
+        return;
+    }
+
+    std::string newValue;
+    if (fieldLine == "1") {
+        // 이름은 필수 항목이다. 빈 값이 입력되면 오류를 안내하고 재입력을 요구한다.
+        while (true) {
+            std::cout << "새 이름: ";
+            if (!std::getline(std::cin, newValue)) {
+                std::cout << "입력이 취소되었습니다.\n";
+                return;
+            }
+            if (!newValue.empty()) {
+                break;
+            }
+            std::cout << "이름은 필수 항목입니다. 다시 입력해 주세요.\n";
+        }
+    } else if (fieldLine == "2") {
+        std::cout << "새 전화번호: ";
+        if (!std::getline(std::cin, newValue)) {
+            std::cout << "입력이 취소되었습니다.\n";
+            return;
+        }
+    } else {
+        std::cout << "새 이메일: ";
+        if (!std::getline(std::cin, newValue)) {
+            std::cout << "입력이 취소되었습니다.\n";
+            return;
+        }
+    }
+
+    try {
+        bool updated = repo_.update(id, [&](Member& member) {
+            if (fieldLine == "1") {
+                member.name = newValue;
+            } else if (fieldLine == "2") {
+                member.phone = newValue;
+            } else {
+                member.email = newValue;
+            }
+        });
+
+        if (updated) {
+            std::cout << "회원 정보가 수정되었습니다.\n";
+        } else {
+            std::cout << "해당 ID의 회원을 찾을 수 없습니다.\n";
+        }
+    } catch (const std::exception& e) {
+        std::cout << "회원 정보 수정에 실패했습니다: " << e.what() << "\n";
+    }
+}
+
 void ConsoleApp::printMember(const Member& member) const {
     std::cout << "id: " << member.id
                << ", 이름: " << member.name
@@ -124,6 +211,11 @@ void ConsoleApp::run() {
 
         if (line == "3") {
             handleReadById();
+            continue;
+        }
+
+        if (line == "4") {
+            handleUpdate();
             continue;
         }
 
