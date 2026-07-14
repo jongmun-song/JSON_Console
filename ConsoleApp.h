@@ -12,6 +12,7 @@ public:
 
 private:
     void printMenu() const;
+    void handleCreate();
 
     MemberRepository& repo_;
 };

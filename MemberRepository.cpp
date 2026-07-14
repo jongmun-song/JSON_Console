@@ -45,3 +45,33 @@ void MemberRepository::save() const {
 const std::vector<Member>& MemberRepository::all() const {
     return memberList_;
 }
+
+int MemberRepository::nextId() const {
+    int maxId = 0;
+    for (const Member& member : memberList_) {
+        if (member.id > maxId) {
+            maxId = member.id;
+        }
+    }
+    return maxId + 1;
+}
+
+Member MemberRepository::create(const Member& input) {
+    if (input.name.empty()) {
+        throw std::invalid_argument("Member name must not be empty.");
+    }
+
+    Member created = input;
+    created.id = nextId();
+
+    memberList_.push_back(created);
+
+    try {
+        save();
+    } catch (...) {
+        memberList_.pop_back();
+        throw;
+    }
+
+    return created;
+}
