@@ -1,0 +1,16 @@
+# Visual Studio
+.vs/
+*.vcxproj.user
+
+# Build output
+Debug/
+Release/
+x64/
+x86/
+*.obj
+*.pdb
+*.ilk
+*.exe
+
+# Secrets - contains a plaintext PAT, must not be committed
+.mcp.json
