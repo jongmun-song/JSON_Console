@@ -46,6 +46,15 @@ const std::vector<Member>& MemberRepository::all() const {
     return memberList_;
 }
 
+std::optional<Member> MemberRepository::findById(int id) const {
+    for (const Member& member : memberList_) {
+        if (member.id == id) {
+            return member;
+        }
+    }
+    return std::nullopt;
+}
+
 int MemberRepository::nextId() const {
     int maxId = 0;
     for (const Member& member : memberList_) {

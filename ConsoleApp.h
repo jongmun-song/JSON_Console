@@ -13,6 +13,9 @@ public:
 private:
     void printMenu() const;
     void handleCreate();
+    void handleReadAll();
+    void handleReadById();
+    void printMember(const Member& member) const;
 
     MemberRepository& repo_;
 };

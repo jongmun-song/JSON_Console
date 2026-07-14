@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <filesystem>
+#include <optional>
 #include <vector>
 
 #include "Member.h"
@@ -26,6 +27,10 @@ public:
     // 4. save()를 호출해 JSON 파일에 반영한다.
     // 반환값: 생성된 Member(부여된 id 포함)
     Member create(const Member& input);
+
+    // id와 일치하는 회원을 memberList_에서 선형 탐색해 반환한다.
+    // 일치하는 항목이 없으면 std::nullopt을 반환한다(예외를 던지지 않는다).
+    std::optional<Member> findById(int id) const;
 
 private:
     int nextId() const;   // memberList_ 내 최댓값 id + 1 (없으면 1)
